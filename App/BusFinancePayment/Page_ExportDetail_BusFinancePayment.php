@@ -22,7 +22,7 @@ class Page_ExportDetail_BusFinancePayment extends Page
 
         $sFileName = "bonus_payment";
         $arrHeader = array("发放序号","顾客号","姓名","身份证","银行名称","账号","金额");
-        $sSql = "Select concat('$sPaymentNo-',iPk) As sNo,sDealerNo, '' As sName, '' As sId, '' As sBank, '' As sAccount,dTotal From bus_finance_payment_detail Where iPaymentPk='$iPaymentPk'";
+        $sSql = "Select concat('$sPaymentNo-',iPk) As sNo,sDealerNo, '' As sName, '' As sId, '' As sBank, '' As sAccount,dRealMoney From bus_finance_payment_detail Where iPaymentPk='$iPaymentPk'";
 
         $arrRecord = $this->getDb()->select($sSql);
 

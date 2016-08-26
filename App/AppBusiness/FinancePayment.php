@@ -107,7 +107,7 @@ class FinancePayment extends AppBusiness
         dDeductTax='$dSumDeductTax',
         dReturnTax='$dSumReturnTax',
         dAddTax='$dSumAddTax',
-        dRealMoney='$dRealMoney',
+        dRealMoney='$dSumRealMoney',
         dtCreateTime=now(),
         iStatus=0
         Where iPk='$iPaymentPk'";
@@ -121,14 +121,13 @@ class FinancePayment extends AppBusiness
      * @param $mapPaymentResults
      * @return bool
      */
-    public function completePayment($iPk,$mapPaymentResults){
+   /* public function completePayment($iPk,$mapPaymentResults){
         $iPaymentPk = $iPk;
         $sPaymentNo = $this->getNoFromPk($iPaymentPk);
         $bValid = true;
 
-        $sSql = "Select sDealerNo,dTotal from bus_finance_payment_detail Where iPaymentPk='$iPaymentPk'";
+        $sSql = "Select sDealerNo,dTotal,dReturnTax,dAddTax from bus_finance_payment_detail Where iPaymentPk='{$iPaymentPk}'";
         $arrResults = $this->getDb()->select($sSql);
-
         //验证$mapPaymentResults中经销商数据是否完整有效
         foreach($arrResults as $v){
             $sDealerNo = $v["sDealerNo"];
@@ -144,9 +143,11 @@ class FinancePayment extends AppBusiness
             foreach($arrResults as $v){
                 $sDealerNo = $v["sDealerNo"];
                 $dTotal = $v["dTotal"];
+                $dReturnTax = $v["dReturnTax"];
+                $dAddTax = $v["dAddTax"];
                 $iStatus = $mapPaymentResults[$sDealerNo];
 
-                $sSql = "Update bus_finance_payment_detail Set iStatus='$iStatus' Where $iPaymentPk=$$iPaymentPk And sDealerNo='$sDealerNo'";
+                $sSql = "Update bus_finance_payment_detail Set iStatus='{$iStatus}' Where iPaymentPk='{$iPaymentPk}' And sDealerNo='{$sDealerNo}'";
                 $this->getDb()->query($sSql);
 
                 $oFPoolMoney = new FinancePoolMoney($sDealerNo,$sPaymentNo);
@@ -157,6 +158,16 @@ class FinancePayment extends AppBusiness
                     $oFPoolMoney->setSMemo("[".__METHOD__."]完成奖金发放--成功");
                     $oFPoolMoney->decreaseLockedMoney($sDealerNo,$dTotal);
                     $oFPoolMoney->decreaseTotalMoney($sDealerNo,$dTotal);
+
+                    $oFPoolTax = new FinancePoolTax($sDealerNo,$sPaymentNo);
+                    if($dReturnTax != 0){
+                        $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，公司退税--成功");
+                        $oFPoolTax->decreaseReturnTax($dReturnTax);
+                    }
+                    if($dAddTax != 0){
+                        $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，经销商补税--成功");
+                        $oFPoolTax->decreaseAddTax($dAddTax);
+                    }
                 }
 
             }
@@ -168,7 +179,7 @@ class FinancePayment extends AppBusiness
             $this->getDb()->query($sSql);
         }
         return $bValid;
-    }
+    }*/
 
     public function deletePayment($iPk){
         $iPaymentPk = $iPk;
@@ -205,14 +216,16 @@ class FinancePayment extends AppBusiness
         if($this->getStatusFromPk($iPaymentPk) != 0){
             $sMsg = "该次发放已经完成，不允许重复导入！";
         }else{
-            $sSql = "Select iPk,CONCAT(sPaymentNo,'-',iPk) As sNo,sDealerNo,dTotal From bus_finance_payment_detail Where iPaymentPk='$iPaymentPk'";
+            $sSql = "Select iPk,CONCAT(sPaymentNo,'-',iPk) As sNo,sDealerNo,dTotal,dReturnTax,dAddTax From bus_finance_payment_detail Where iPaymentPk='$iPaymentPk'";
             $arrRecord = $this->getDb()->select($sSql);
             $arrNoDataBase = $mapDetailInfo = array();
             foreach($arrRecord as $v){
                 $arrNoDataBase[] = $v['sNo'];
                 $mapDetailInfo[$v["iPk"]] = array(
                     "sDealerNo"=>$v["sDealerNo"],
-                    "dTotal"=>$v["dTotal"]
+                    "dTotal"=>$v["dTotal"],
+                    "dReturnTax"=>$v["dReturnTax"],
+                    "dAddTax"=>$v["dAddTax"]
                 );
             }
 
@@ -259,15 +272,28 @@ class FinancePayment extends AppBusiness
 
                     $sDealerNo = $mapDetailInfo[$iPaymentDetailPk]["sDealerNo"];
                     $dMoney = $mapDetailInfo[$iPaymentDetailPk]["dTotal"];
+                    $dReturnTax = $mapDetailInfo[$iPaymentDetailPk]["dReturnTax"];
+                    $dAddTax = $mapDetailInfo[$iPaymentDetailPk]["dAddTax"];
                     $sRelationNo = "{$sPaymentNo}-{$iPaymentDetailPk}";
+
                     $oFPoolMoney = new FinancePoolMoney($sDealerNo,$sRelationNo);
-                    if($iStatus == 1){
+                    if($iStatus == 1){//失败，释放占用金额
                         $oFPoolMoney->setSMemo("[".__METHOD__."]发放结果导入，失败");
                         $oFPoolMoney->decreaseLockedMoney($dMoney);
-                    }else if($iStatus == 2){
+                    }else if($iStatus == 2){//成功，释放占用金额并减去总金额
                         $oFPoolMoney->setSMemo("[".__METHOD__."]发放结果导入，成功");
                         $oFPoolMoney->decreaseLockedMoney($dMoney);
                         $oFPoolMoney->decreaseTotalMoney($dMoney);
+
+                        $oFPoolTax = new FinancePoolTax($sDealerNo,$sRelationNo);
+                        if($dReturnTax != 0){
+                            $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，公司退税--成功");
+                            $oFPoolTax->decreaseReturnTax($dReturnTax);
+                        }
+                        if($dAddTax != 0){
+                            $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，经销商补税--成功");
+                            $oFPoolTax->decreaseAddTax($dAddTax);
+                        }
                     }
                 }
                 $sMsg = "导入成功！";

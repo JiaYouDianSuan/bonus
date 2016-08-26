@@ -39,13 +39,14 @@ class Segment_Button extends Segment {
 		$arrButton = array ();
 		$mapButton = $this->getButton ();
 		$arrButtonInDeleteFlag = array("View","Detail");
+		$arrButtonInConfirmFlag = array("UnConfirm","View","Detail");
 
 		$iConfirmFlag == 1 && $sButtonCodes = str_replace('Confirm', 'UnConfirm', $sButtonCodes);		
 		$arrCode = explode ( ',', $sButtonCodes );		
 		foreach ( $arrCode as $v ) {
 			if(!$this->isCanShowInRow($arrRow,$v)) continue;
 			if($iDeleteFlag == 1 && !in_array($v,$arrButtonInDeleteFlag)) continue;//删除状态，只显示某些按钮
-			if($iConfirmFlag == 1 && $v!='UnConfirm' && $v!='View') continue;
+			if($iConfirmFlag == 1 && !in_array($v,$arrButtonInConfirmFlag)) continue;//审核状态，只显示某些按钮
 			
 			$sButton = str_replace ( '{Id}', $sId, $mapButton [$v] );
 			$sButton = str_replace ( '{App}', $this->getApp (), $sButton );
