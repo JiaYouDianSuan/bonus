@@ -45,6 +45,7 @@ class Model_Submit extends Model {
 		$arrDetailItems_update = $_POST ['detailItems_update'];
 		$iDetailNum = $_POST ['dwz_rowNum'];
 		$iId = $_POST [KEY_FIELD_NAME];
+
 		$this->unsetField ();
 		if (true !== $result = $this->beforeFormSave ( $iId ))
 			return $result;
@@ -65,12 +66,12 @@ class Model_Submit extends Model {
 			}
 		}		
 		if(!empty($arrSqlWhere_KeyField)){//如果表中有唯一类型字段，验证该字段的唯一性
-			$sSql = 'Select count('.$sKeyField.') As iCount From ' . $sMainTable . ' Where '.implode(' And ', $arrSqlWhere_KeyField);			
+			$sSql = "Select count({$sKeyField}) As iCount From {$sMainTable} Where ".implode(' And ', $arrSqlWhere_KeyField)." And {$sKeyField}!='{$iId}'";
 			$arrRecord = $this->getDb ()->select ( $sSql );
 			if($arrRecord[0]['iCount'] > 0){
 				return array (
 					'status' => 'error',
-					'message' => '字段 '.implode(',',$arrKeyFieldName).' 不允许重复！' 
+					'message' => '字段 【'.implode(',',$arrKeyFieldName).'】 不允许重复！'
 				);
 			}
 		} 			
