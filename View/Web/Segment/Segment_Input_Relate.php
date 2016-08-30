@@ -29,7 +29,7 @@ class Segment_Input_Relate extends Segment_Input {
         $sHtml = '<p>';
         $sHtml .= '<label>' . $this->getLabel() . '：</label>';
         $sHtml .= '<select class="combox" name="' . $this->getField() . '">';
-        $sHtml .= '<option value="">全部</option>';
+        $sHtml .= '<option value="">无</option>';
         foreach ($arrData as $v) {
             $sSelected = $this->getValue() == $v['keyField'] ? ' selected=selected ' : '';
             $sHtml .= '<option value="' . $v['keyField'] . '"' . $sSelected . '>' . $v['displayField'] . '</option>';

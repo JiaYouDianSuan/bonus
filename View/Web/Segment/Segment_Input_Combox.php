@@ -36,7 +36,7 @@ class Segment_Input_Combox extends Segment_Input {
         $sHtml = '<p>';
         $sHtml .= '<label>' . $this->getLabel() . '：</label>';
         $sHtml .= '<select class="combox" name="' . $this->getField() . '">';
-        $sHtml .= '<option value="">全部</option>';    
+        $sHtml .= '<option value="">无</option>';
 
         foreach ($arrData as $k => $v) {
             $sSelected = $this->getValue() == $k ? ' selected=selected ' : '';
