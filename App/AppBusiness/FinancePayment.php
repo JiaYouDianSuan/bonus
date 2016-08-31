@@ -96,7 +96,7 @@ class FinancePayment extends AppBusiness
             '$iStatus')";
             $this->getDb()->query($sSql);
             $oFPoolMoney = new FinancePoolMoney($sDealerNo,$sPaymentNo);
-            $oFPoolMoney->setSMemo("[".__METHOD__."]新增奖金发放");
+            $oFPoolMoney->setSMemo("新增奖金发放。[".__METHOD__."]");
             $oFPoolMoney->increaseLockedMoney($dTotal);
         }
 
@@ -192,7 +192,7 @@ class FinancePayment extends AppBusiness
                 $sPaymentNo = $v["sPaymentNo"];
                 $dTotal = $v["dTotal"];
                 $oFPoolMoney = new FinancePoolMoney($sDealerNo,$sPaymentNo);
-                $oFPoolMoney->setSMemo("[".__METHOD__."]删除奖金发放");
+                $oFPoolMoney->setSMemo("删除奖金发放。[".__METHOD__."]");
                 $oFPoolMoney->decreaseLockedMoney($dTotal);
             }
             $sSql = "Update bus_finance_payment Set iSysDelete=1 Where iPk='$iPaymentPk'";
@@ -278,20 +278,20 @@ class FinancePayment extends AppBusiness
 
                     $oFPoolMoney = new FinancePoolMoney($sDealerNo,$sRelationNo);
                     if($iStatus == 1){//失败，释放占用金额
-                        $oFPoolMoney->setSMemo("[".__METHOD__."]发放结果导入，失败");
+                        $oFPoolMoney->setSMemo("发放结果导入，失败。[".__METHOD__."]");
                         $oFPoolMoney->decreaseLockedMoney($dMoney);
                     }else if($iStatus == 2){//成功，释放占用金额并减去总金额
-                        $oFPoolMoney->setSMemo("[".__METHOD__."]发放结果导入，成功");
+                        $oFPoolMoney->setSMemo("发放结果导入，成功。[".__METHOD__."]");
                         $oFPoolMoney->decreaseLockedMoney($dMoney);
                         $oFPoolMoney->decreaseTotalMoney($dMoney);
 
                         $oFPoolTax = new FinancePoolTax($sDealerNo,$sRelationNo);
                         if($dReturnTax != 0){
-                            $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，公司退税--成功");
+                            $oFPoolTax->setSMemo("完成奖金发放--成功，公司退税--成功。[".__METHOD__."]");
                             $oFPoolTax->decreaseReturnTax($dReturnTax);
                         }
                         if($dAddTax != 0){
-                            $oFPoolTax->setSMemo("[".__METHOD__."]完成奖金发放--成功，经销商补税--成功");
+                            $oFPoolTax->setSMemo("完成奖金发放--成功，经销商补税--成功。[".__METHOD__."]");
                             $oFPoolTax->decreaseAddTax($dAddTax);
                         }
                     }

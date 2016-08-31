@@ -155,10 +155,10 @@ class FinanceTax extends AppBusiness
             $dAdjustTax = $dDeductTax - $dShouldDeductTax;
             $oFPTax = new FinancePoolTax($sDealerNo, $sTaxNo);
             if ($dAdjustTax > 0) {//需要退税
-                $oFPTax->setSMemo("[".__METHOD__."]{$sMonth}税金计算，公司退税。");
+                $oFPTax->setSMemo("{$sMonth}税金计算，公司退税。[".__METHOD__."]");
                 $oFPTax->increaseReturnTax($dAdjustTax);
             } else if ($dAdjustTax < 0) {//需要补税
-                $oFPTax->setSMemo("[".__METHOD__."]{$sMonth}税金计算，经销商补税。");
+                $oFPTax->setSMemo("{$sMonth}税金计算，经销商补税。[".__METHOD__."]");
                 $oFPTax->increaseAddTax($dAdjustTax);
             }
 
@@ -204,7 +204,7 @@ class FinanceTax extends AppBusiness
 
             foreach ($arrRecords as $v) {
                 $oFPTax = new FinancePoolTax($v["sDealerNo"], $v["sNo"]);
-                $oFPTax->setSMemo("[".__METHOD__."]删除{$v["sMonth"]}税金管理记录。");
+                $oFPTax->setSMemo("删除{$v["sMonth"]}税金管理记录。[".__METHOD__."]");
                 if ($v["dAdjustTax"] > 0) {//需要退税
                     $oFPTax->decreaseReturnTax($v["dAdjustTax"]);
                 } else if ($v["dAdjustTax"] < 0) {//需要补税
