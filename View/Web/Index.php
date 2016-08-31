@@ -110,7 +110,7 @@ $JFrame = new Frame();
             </div>
             <?PHP echo $JFrame->show(); ?>
         </div>
-        <div id="footer">Copyright &copy; 2010 <a href="demo_page2.html" target="dialog">DWZ团队</a> Tel：010-52897073</div>
+        <div id="footer">Copyright &copy; 金士力佳友</div>
     </body>
 </html>
 <script>
