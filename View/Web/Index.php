@@ -95,7 +95,7 @@ $JFrame = new Frame();
                     <a class="logo" href="http://j-ui.com">标志</a>                    
                     <ul class="nav">                    
                         <li style='padding-top: 2px;'><a style='TEXT-DECORATION:none; cursor:default;'><?php echo $_SESSION['login']['name']; ?> 欢迎您</a></li>
-                        <li style='padding-top: 2px;'><a href="ChangePassword.php" target="dialog" width="600">设置</a></li>                                                                        
+                        <li style='padding-top: 2px;'><a href="ChangePassword.php" target="dialog" width="600">修改密码</a></li>
                         <li style='padding-top: 2px;'><a href="Logout.php">退出</a></li>
                     </ul>
                     <ul class="themeList" id="themeList">
