@@ -77,8 +77,8 @@ class Model_Table extends Model {
 		$arrSqlWhere = array ();
 		$mapAppStruct = $this->getAppStruct ( $this->getApp () );
 		$sTable = $mapAppStruct ['table'] ['name'];
-		
-		if (! empty ( $arrAuthority ['Range'] ['read'] [$this->getApp ()] ) && $arrAuthority ['Range'] ['read'] [$this->getApp ()] == 'Self') {
+
+		if (is_array($arrAuthority) && ! empty ( $arrAuthority ['Range'] ['read'] [$this->getApp ()] ) && $arrAuthority ['Range'] ['read'] [$this->getApp ()] == 'Self') {
 			$arrSqlWhere [] = $sTable . '.' . USER_FIELD_NAME . ' = "' . $arrLogin ['id'] . '"';
 		}
 		return $arrSqlWhere;
